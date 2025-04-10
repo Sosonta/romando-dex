@@ -175,7 +175,7 @@ img {
   border: none;
   padding: 10px 14px;
   font-size: 18px;
-  border-radius: 8px;
+  border-radius: 2px;
   cursor: pointer;
   z-index: 999;
 }
@@ -410,7 +410,7 @@ label[for="seen-toggle"] {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: none;
+  border: 2px solid #EFF0EF; /* 👈 Add this line */
   background-color: #444;
   color: white;
   font-size: 20px;
@@ -496,3 +496,27 @@ label[for="seen-toggle"] {
   animation: pokemon-triplehop 1.4s ease-in-out;
 }
 
+#top-nav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  background-color: #444;
+  padding: 12px 0;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.nav-link:hover {
+  background-color: #666;
+}
