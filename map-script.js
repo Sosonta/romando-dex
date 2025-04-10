@@ -375,14 +375,30 @@ picker.style.transform = "none"; // disable centering transform
   document.body.appendChild(picker);
 }
 
-  if (action === "description") {
-    const p = wrapper.querySelector(".popup p");
-    p.contentEditable = true;
-    p.focus();
-    p.onblur = async () => {
-      p.contentEditable = false;
-      await updateDoc(docRef, { description: p.textContent });
-    };
+if (action === "description") {
+  const popup = wrapper.querySelector(".popup");
+  const p = popup?.querySelector("p");
+
+  if (!p) return;
+
+  // Enable editing
+  p.contentEditable = true;
+  p.style.outline = "2px dashed #999";
+  p.focus();
+
+  // Remove existing blur handler if any
+  p.onblur = async () => {
+    p.contentEditable = false;
+    p.style.outline = "none";
+    await updateDoc(docRef, { description: p.textContent });
+p.onkeydown = async (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    p.blur(); // triggers onblur to save
+  }
+};
+}
+
   }
 }
 
