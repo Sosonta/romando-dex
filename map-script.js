@@ -19,8 +19,8 @@ async function loadMarkers() {
 
     const markerImg = document.createElement("img");
     markerImg.src = `map-assets/markers/marker-${data.type || "note"}.png`;
-    markerImg.style.width = "64px";
-    markerImg.style.height = "64px";
+    markerImg.style.width = "48px";
+    markerImg.style.height = "48px";
 
     const popup = document.createElement("div");
     popup.className = "popup";

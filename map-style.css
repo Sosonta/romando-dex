@@ -37,8 +37,8 @@ body {
 /* Marker & Popup Styles */
 .marker {
   position: absolute;
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   cursor: pointer;
 }
 
