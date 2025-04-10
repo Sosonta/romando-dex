@@ -267,8 +267,14 @@ if (action === "delete") {
   const confirmDelete = confirm("Are you sure you want to delete this marker?");
   if (!confirmDelete) return;
 
-  await deleteDoc(docRef);
-  wrapper.remove();
+  // Add shrinking animation
+  wrapper.classList.add("shrinking");
+
+  // Wait for animation before removing
+  setTimeout(async () => {
+    await deleteDoc(docRef);
+    wrapper.remove();
+  }, 300); // Match the 0.3s animation duration
 }
 
   if (action === "move") {
@@ -377,31 +383,43 @@ picker.style.transform = "none"; // disable centering transform
 
 if (action === "description") {
   const popup = wrapper.querySelector(".popup");
-  const p = popup?.querySelector("p");
+  const p = popup.querySelector("p");
 
-  if (!p) return;
+  // Show popup while editing
+  wrapper.classList.add("editing");
+  popup.style.display = "block"; // ensure it's shown
 
-  // Enable editing
   p.contentEditable = true;
-  p.style.outline = "2px dashed #999";
   p.focus();
 
-  // Remove existing blur handler if any
-  p.onblur = async () => {
+  // Optional styling for edit mode
+  p.style.outline = "2px dashed #888";
+  p.style.background = "#f0f0f0";
+  p.style.padding = "4px";
+
+  const save = async () => {
     p.contentEditable = false;
-    p.style.outline = "none";
-    await updateDoc(docRef, { description: p.textContent });
-p.onkeydown = async (e) => {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    p.blur(); // triggers onblur to save
-  }
-};
-}
+    wrapper.classList.remove("editing");
+    p.style.outline = "";
+    p.style.background = "";
+    p.style.padding = "";
+    popup.style.display = ""; // back to hover mode
+    await updateDoc(doc(db, "mapMarkers", markerId), { description: p.textContent });
+  };
 
-  }
-}
+  const handleClickOutside = (e) => {
+    if (!popup.contains(e.target)) {
+      document.removeEventListener("click", handleClickOutside);
+      save();
+    }
+  };
 
+  // Delay listener slightly to avoid immediately catching the click that triggered editing
+  setTimeout(() => {
+    document.addEventListener("click", handleClickOutside);
+  }, 10);
+}
+}
 loadMarkers();
 
 document.getElementById("add-marker-btn").addEventListener("click", () => {

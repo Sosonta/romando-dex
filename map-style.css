@@ -63,9 +63,10 @@ body {
 }
 
 .marker .popup img {
-  width: 100%;
+  width: 80%;             /* 👈 reduce from 100% */
+  display: block;         /* center with margin auto */
+  margin: 0 auto 8px auto;
   border-radius: 4px;
-  margin-bottom: 5px;
 }
 
 #add-marker-btn {
@@ -142,3 +143,40 @@ body {
   background-color: #555;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);  /* 👈 include X and Y */
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);    /* 👈 stay horizontally centered */
+  }
+}
+
+/* Apply it to the marker popup */
+.marker .popup {
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none; /* Prevent interaction until visible */
+}
+
+/* On hover, fade in */
+.marker:hover .popup,
+.marker.editing .popup {
+  opacity: 1;
+  animation: fadeIn 0.3s ease forwards;
+  pointer-events: auto;
+  display: block; /* Ensure it's visible */
+}
+
+@keyframes shrinkOut {
+  to {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.marker.shrinking {
+  animation: shrinkOut 0.3s ease forwards;
+}
