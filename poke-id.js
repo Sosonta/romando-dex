@@ -99,6 +99,10 @@ onAuthStateChanged(auth, async (user) => {
       const trainerClass = data?.character?.class || '';
       const currentHp = data?.character?.currentHp || 0;
       const poke = data?.character?.poke || 0;
+const imageData = data?.character?.profileImage || null;
+if (imageData) {
+  profileImage.src = imageData;
+}
 
       document.getElementById('poke-money').value = poke;
       inspirationInput.value = inspiration;
@@ -159,9 +163,11 @@ levelInput.addEventListener('input', saveStatsToFirestore);
 classInput.addEventListener('input', saveStatsToFirestore);
 hpInput.addEventListener('input', saveStatsToFirestore);
 
+
 // Auto-save on input
 inspirationInput.addEventListener('input', saveStatsToFirestore);
 proficiencyInput.addEventListener('input', saveStatsToFirestore);
+document.getElementById('poke-money').addEventListener('input', saveStatsToFirestore);
 
     function createFeatureCard(title = '', description = '') {
       const card = document.createElement('div');
@@ -410,8 +416,18 @@ uploadInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) {
     const reader = new FileReader();
-    reader.onload = function (e) {
-      profileImage.src = e.target.result;
+    reader.onload = async function (e) {
+      const imageData = e.target.result;
+      profileImage.src = imageData;
+
+      // ✅ Save to Firestore
+      const user = auth.currentUser;
+      if (user) {
+        const docRef = doc(db, "pokeIDs", user.uid);
+        await updateDoc(docRef, {
+          "character.profileImage": imageData
+        });
+      }
     };
     reader.readAsDataURL(file);
   }
