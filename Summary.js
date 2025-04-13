@@ -21,6 +21,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const typeColors = {
+  normal: '#A8A878',
+  fire: '#F08030',
+  water: '#6890F0',
+  electric: '#F8D030',
+  grass: '#78C850',
+  ice: '#98D8D8',
+  fighting: '#C03028',
+  poison: '#A040A0',
+  ground: '#E0C068',
+  flying: '#A890F0',
+  psychic: '#F85888',
+  bug: '#A8B820',
+  rock: '#B8A038',
+  ghost: '#705898',
+  dragon: '#7038F8',
+  dark: '#705848',
+  steel: '#B8B8D0',
+  fairy: '#EE99AC'
+};
 
 // Track tabs and summaries
 const tabBar = document.getElementById("tab-bar");
@@ -226,7 +246,19 @@ function updateHPBar() {
   const current = Number(currentHpInput?.value || 0);
   const percent = Math.min(100, Math.max(0, (current / maxHP) * 100));
 
-  if (barFill) barFill.style.width = `${percent}%`;
+  if (barFill) {
+    barFill.style.width = `${percent}%`;
+
+    // 🔄 Change color based on HP %
+    if (percent > 60) {
+      barFill.style.background = "green";
+    } else if (percent > 30) {
+      barFill.style.background = "goldenrod"; // yellow
+    } else {
+      barFill.style.background = "crimson"; // red
+    }
+  }
+
   if (maxDisplay) maxDisplay.textContent = ` / ${maxHP}`;
 }
 
@@ -452,23 +484,71 @@ function updateEvasionDisplay() {
 const movesBox = document.createElement('div');
 movesBox.className = 'moves-box';
 
-const moves = target.moves || Array(6).fill({ name: '', desc: '' });
+const moves = target.moves || Array(6).fill({ name: '', tag: '', desc: '' });
 
 moves.forEach((move, index) => {
   const moveWrapper = document.createElement('div');
   moveWrapper.className = 'move-wrapper';
 
-  // Move name (editable title)
+  // 🆕 Row to hold both title and tag input
+  const nameRow = document.createElement('div');
+  nameRow.className = 'move-name-row';
+
+  // Move title input
   const nameInput = document.createElement('input');
   nameInput.type = 'text';
   nameInput.placeholder = `Move ${index + 1}`;
   nameInput.value = move.name || '';
+  nameInput.className = 'move-title';
   nameInput.onchange = async (e) => {
     moves[index].name = e.target.value;
     await saveMoves();
   };
 
-  // Move description (editable text)
+  // Small tag input
+  const tagInput = document.createElement('input');
+  tagInput.type = 'text';
+  tagInput.placeholder = 'N/A';
+  tagInput.value = move.tag || '';
+  tagInput.className = 'move-tag';
+  tagInput.onchange = async (e) => {
+    moves[index].tag = e.target.value;
+    await saveMoves();
+  };
+
+// New Field (e.g. PP)
+const metaInput = document.createElement('input');
+metaInput.type = 'text';
+metaInput.placeholder = 'Type';
+metaInput.value = move.meta || '';
+metaInput.className = 'move-meta';
+metaInput.onchange = async (e) => {
+  const val = e.target.value.trim().toLowerCase();
+  moves[index].meta = e.target.value;
+  await saveMoves();
+
+  // ✅ Check if it matches a valid type
+  if (typeColors[val]) {
+    metaInput.style.backgroundColor = typeColors[val];
+    metaInput.style.color = 'white';
+  } else {
+    metaInput.style.backgroundColor = '';
+    metaInput.style.color = '';
+  }
+};
+
+// Immediately apply color if already set
+const typeVal = (move.meta || '').trim().toLowerCase();
+if (typeColors[typeVal]) {
+  metaInput.style.backgroundColor = typeColors[typeVal];
+  metaInput.style.color = 'white';
+}
+
+  nameRow.appendChild(nameInput);
+  nameRow.appendChild(tagInput);
+nameRow.appendChild(metaInput);
+
+  // Move description input
   const descInput = document.createElement('textarea');
   descInput.placeholder = 'Move description...';
   descInput.value = move.desc || '';
@@ -477,7 +557,7 @@ moves.forEach((move, index) => {
     await saveMoves();
   };
 
-  moveWrapper.appendChild(nameInput);
+  moveWrapper.appendChild(nameRow);
   moveWrapper.appendChild(descInput);
   movesBox.appendChild(moveWrapper);
 });

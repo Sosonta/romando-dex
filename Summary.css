@@ -110,6 +110,8 @@ body {
   margin-top: 24px;
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* exactly 3 columns */
+  width: 100%;
+  box-sizing: border-box;
   gap: 16px;
 }
 
@@ -127,6 +129,11 @@ body {
 .move-wrapper textarea {
   background-color: #fff2e0; /* soft orange */
   border: 1px solid #e0a050;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px;
+  font-size: 1rem;
+  resize: vertical;
   border-radius: 2px;
   resize: vertical;
   min-height: 60px;
@@ -345,6 +352,7 @@ body {
   margin-bottom: 20px;
   border: 2px solid #333;
   color: white;
+  box-sizing: border-box;
 }
 
 .stat-hp {
@@ -462,4 +470,96 @@ Add these new rules to your CSS file for the evasion blocks:
   border: 1px solid #dcdcdc;
   border-radius: 2px;
   padding: 4px;
+}
+
+.move-name-row {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.move-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 6px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 1rem;
+}
+
+.move-tag {
+  width: 70px;
+  flex-shrink: 0;
+  padding: 6px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 1rem;
+}
+
+.move-wrapper .move-name-row .move-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 6px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+.move-wrapper .move-name-row .move-tag {
+  width: 70px; /* now properly shrunk */
+  flex-shrink: 0;
+  padding: 6px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+.move-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.move-wrapper,
+.move-name-row,
+.move-wrapper input,
+.move-wrapper textarea {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.move-name-row {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.move-title {
+  flex: 1;
+  min-width: 0;
+  padding: 6px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+.move-meta {
+  width: 70px;
+  flex-shrink: 0;
+  padding: 6px;
+  font-size: 1rem;
+  border-radius: 2px;
+  box-sizing: border-box;
+  border: none !important;
+  text-align: center; /* ✅ center text */
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.2); /* ✅ subtle depth */
+  font-weight: bold;
+  color: white; /* default white in case colored background is applied early */
 }
