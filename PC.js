@@ -309,7 +309,7 @@ async function renderModalOptions() {
       img.src = `pokemon-images/${paddedDex}.png`;
       img.className = 'modal-pokemon';
       img.alt = `Dex ${paddedDex}`;
-      img.onclick = () => addPokemonToPC(dexNum);
+      img.onclick = () => addPokemonToPC(dexNum, false);
       modalGrid.appendChild(img);
     }
   });
@@ -325,12 +325,12 @@ async function renderModalOptions() {
     img.src = `national-pokemon/${filename}`;
     img.className = 'modal-pokemon';
     img.alt = `Dex ${dexNum}`;
- img.onclick = () => addPokemonToPC(dexNum.replace('.png', ''));
+ img.onclick = () => addPokemonToPC(dexNum.replace('.png', ''), true);
     modalGrid.appendChild(img);
   });
 }
 
-async function addPokemonToPC(dexNum) {
+async function addPokemonToPC(dexNum, isNational = false) {
   if (!currentUser) return;
 
   const docRef = doc(db, "pokeIDs", currentUser.uid);
@@ -349,7 +349,7 @@ currentPC.push({
   type1: '',
   type2: '',
   notes: '',
-  national: true
+  national: isNational
 });
 }
 
