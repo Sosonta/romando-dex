@@ -244,12 +244,14 @@ function openSummary(dex) {
   // Otherwise, we must open the window directly from a user-initiated event
   summaryWindow = window.open("Summary.html", "summaryWindow", "width=1050,height=700");
 
-  const checkReady = setInterval(() => {
-    if (summaryWindow && summaryWindow.postMessage) {
-      summaryWindow.postMessage({ type: "OPEN_SUMMARY", dex }, "*");
-      clearInterval(checkReady);
-    }
-  }, 100);
+function handleSummaryReady(e) {
+  if (e.source === summaryWindow && e.data?.type === "SUMMARY_READY") {
+    summaryWindow.postMessage({ type: "OPEN_SUMMARY", dex }, "*");
+    window.removeEventListener("message", handleSummaryReady);
+  }
+}
+
+window.addEventListener("message", handleSummaryReady);
 }
 
 // Summary button click handler

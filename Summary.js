@@ -55,13 +55,15 @@ window.addEventListener("message", (event) => {
 
   const dex = data.dex;
   if (openTabs.has(dex)) {
-    // Switch to already-open tab
     setActiveTab(dex);
     return;
   }
 
   createTab(dex);
 });
+
+// ✅ Tell the opener you're ready
+window.opener?.postMessage({ type: "SUMMARY_READY" }, "*");
 
 function createTab(dex) {
   const tabId = `tab-${dex}`;
