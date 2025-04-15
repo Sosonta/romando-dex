@@ -121,7 +121,6 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // 🔍 Fetch Pokémon base info (name, type, etc.) and build layout
-// 🔍 Fetch Pokémon base info (name, type, etc.) and build layout
 async function populateSummary(dex, container) {
   let maxHP = 0;
   let currentHpInput = null;
@@ -129,85 +128,86 @@ async function populateSummary(dex, container) {
   let maxDisplay = null;
 
   const paddedDex = dex.toString().padStart(3, '0');
-  const q = query(collection(db, "pokemon"), where("Dex Number", "==", dex));
-  const querySnapshot = await getDocs(q);
-
   let data = null;
   let isNationalPokemon = false;
 
-if (!querySnapshot.empty) {
-  data = querySnapshot.docs[0].data();
-} else {
-  console.warn(`Pokémon #${dex} not found in Firebase. Checking if it's national.`);
-  isNationalPokemon = true;
-  data = {
-    Name: `National #${dex}`,
-    Types: [], // Can be editable
-  };
-}
+  try {
+    const q = query(collection(db, "pokemon"), where("Dex Number", "==", dex));
+    const querySnapshot = await getDocs(q);
 
-  // Clear and build base content
-  container.innerHTML = '';
+    if (!querySnapshot.empty) {
+      data = querySnapshot.docs[0].data();
+    } else {
+      console.warn(`Pokémon #${dex} not found in Firebase. Treating as national.`);
+      isNationalPokemon = true;
+      data = {
+        Name: `National #${dex}`,
+        Types: [],
+      };
+    }
 
-let title = null;
-if (!isNationalPokemon) {
-  title = document.createElement('h2');
-  title.textContent = data.Name || `#${dex}`;
-}
+    // Clear and build base content
+    container.innerHTML = '';
 
-  const image = document.createElement('img');
-  image.src = isNationalPokemon
-  ? `national-pokemon/${dex}.png`
-  : `pokemon-images/${paddedDex}.png`;
-  image.alt = `Pokémon ${data.Name}`;
-  image.className = 'summary-img';
+    let title = null;
+    if (!isNationalPokemon) {
+      title = document.createElement('h2');
+      title.textContent = data.Name || `#${dex}`;
+    }
 
-  const typeBox = document.createElement('div');
-  typeBox.className = 'summary-types';
-  (data.Types || []).forEach(type => {
-    const span = document.createElement('span');
-    span.textContent = type;
-    span.className = `type-tag type-${type.toLowerCase()}`;
-    typeBox.appendChild(span);
-  });
+    const image = document.createElement('img');
+    image.src = isNationalPokemon
+      ? `national-pokemon/${dex}.png`
+      : `pokemon-images/${paddedDex}.png`;
+    image.alt = `Pokémon ${data.Name}`;
+    image.className = 'summary-img';
 
-  const headerBox = document.createElement('div');
-  headerBox.className = 'summary-header';
+    const typeBox = document.createElement('div');
+    typeBox.className = 'summary-types';
+    (data.Types || []).forEach(type => {
+      const span = document.createElement('span');
+      span.textContent = type;
+      span.className = `type-tag type-${type.toLowerCase()}`;
+      typeBox.appendChild(span);
+    });
 
-  const imageWrapper = document.createElement('div');
-  imageWrapper.className = 'summary-image-wrapper';
-  imageWrapper.appendChild(image);
+    const headerBox = document.createElement('div');
+    headerBox.className = 'summary-header';
 
-  const infoWrapper = document.createElement('div');
-  infoWrapper.className = 'summary-info-wrapper';
-if (title) infoWrapper.appendChild(title);
-  infoWrapper.appendChild(typeBox);
+    const imageWrapper = document.createElement('div');
+    imageWrapper.className = 'summary-image-wrapper';
+    imageWrapper.appendChild(image);
 
-  headerBox.appendChild(imageWrapper);
-  headerBox.appendChild(infoWrapper);
-  container.appendChild(headerBox);
+    const infoWrapper = document.createElement('div');
+    infoWrapper.className = 'summary-info-wrapper';
+    if (title) infoWrapper.appendChild(title);
+    infoWrapper.appendChild(typeBox);
 
-  // 🔍 Fetch user's data for this Pokémon
-  const userDocRef = doc(db, "pokeIDs", currentUser.uid);
-  const userSnap = await getDoc(userDocRef);
-  const userData = userSnap.data();
-const userPC = userData?.pcPokemon || [];
-const userTeam = userData?.teamPokemon || [];
+    headerBox.appendChild(imageWrapper);
+    headerBox.appendChild(infoWrapper);
+    container.appendChild(headerBox);
 
-let target = userPC.find(p => p?.dex === dex);
-let isFromTeam = false;
+    // Fetch user's data for this Pokémon
+    const userDocRef = doc(db, "pokeIDs", currentUser.uid);
+    const userSnap = await getDoc(userDocRef);
+    const userData = userSnap.data();
+    const userPC = userData?.pcPokemon || [];
+    const userTeam = userData?.teamPokemon || [];
 
-if (!target) {
-  target = userTeam.find(p => p?.dex === dex);
-  if (target) isFromTeam = true;
-}
+    let target = userPC.find(p => p?.dex === dex);
+    let isFromTeam = false;
 
-if (!target) {
-  const err = document.createElement('p');
-  err.textContent = `Pokémon #${dex} not found in your PC or Team.`;
-  container.appendChild(err);
-  return;
-}
+    if (!target) {
+      target = userTeam.find(p => p?.dex === dex);
+      if (target) isFromTeam = true;
+    }
+
+    if (!target) {
+      const err = document.createElement('p');
+      err.textContent = `Pokémon #${dex} not found in your PC or Team.`;
+      container.appendChild(err);
+      return;
+    }
 
 if (isNationalPokemon) {
   const nationalBox = document.createElement('div');
@@ -746,6 +746,12 @@ infoBox.appendChild(hpSection);
 
     await updateDoc(userDocRef, { pcPokemon: pc });
   }
+} catch (error) {
+  console.error("❌ Error populating summary:", error);
+  const err = document.createElement('p');
+  err.textContent = `An error occurred while loading the summary for Pokémon #${dex}.`;
+  container.appendChild(err);
+}
 }
 
 function closeTab(dex) {
