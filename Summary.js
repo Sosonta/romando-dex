@@ -116,14 +116,45 @@ function setActiveTab(dex) {
 
 let currentUser = null;
 
+let authIsReady = false;
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
+    authIsReady = true;
+    console.log("✅ Firebase Auth ready:", currentUser.uid);
+  } else {
+    console.warn("❌ User not logged in");
   }
 });
 
+async function updateField(field, value) {
+  if (!currentUser) {
+    console.error("❌ Cannot save — currentUser is null");
+    return;
+  }
+
+  const snap = await getDoc(userDocRef);
+  const data = snap.data();
+  const pc = data?.pcPokemon || [];
+  const index = pc.findIndex(p => p?.dex === dex);
+  if (index === -1) return;
+
+  pc[index] = {
+    ...pc[index],
+    [field]: value
+  };
+
+  await updateDoc(userDocRef, { pcPokemon: pc });
+}
+
 // 🔍 Fetch Pokémon base info (name, type, etc.) and build layout
 async function populateSummary(dex, container) {
+// Wait until Firebase Auth is ready
+while (!authIsReady) {
+  console.log("⏳ Waiting for Firebase Auth...");
+  await new Promise(resolve => setTimeout(resolve, 100));
+}
   let maxHP = 0;
   let currentHpInput = null;
   let barFill = null;
