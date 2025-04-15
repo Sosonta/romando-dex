@@ -128,7 +128,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-async function updateField(field, value) {
+async function updateField(field, value, dex) {
   if (!currentUser) {
     console.error("❌ Cannot save — currentUser is null");
     return;
@@ -272,7 +272,7 @@ if (isNationalPokemon) {
   speciesInput.placeholder = 'Species';
   speciesInput.value = target?.species || '';
   speciesInput.onchange = async (e) => {
-    await updateField("species", e.target.value);
+  await updateField("species", e.target.value, dex);
   };
   nationalBox.appendChild(speciesInput);
 
@@ -314,7 +314,7 @@ applyTypeColor(type1Input); // Set initial color
 type1Input.onchange = async (e) => {
   const val = e.target.value;
   applyTypeColor(type1Input);
-  await updateField("type1", val);
+  await updateField("type1", val, dex);
 };
 
 const type2Input = document.createElement('input');
@@ -325,7 +325,7 @@ applyTypeColor(type2Input); // Set initial color
 type2Input.onchange = async (e) => {
   const val = e.target.value;
   applyTypeColor(type2Input);
-  await updateField("type2", val);
+  await updateField("type2", val, dex);
 };
 
 typeRow.appendChild(type1Input);
@@ -424,7 +424,7 @@ basicRow.className = 'inline-fields';
 
 basicRow.appendChild(
   labeledInput("Name", target.name || '', (val) => {
-    updateField("name", val);
+    updateField("name", val, dex);
     const tabInfo = openTabs.get(dex);
     if (tabInfo) {
       tabInfo.tabEl.childNodes[0].textContent = val || `#${dex}`; // updates the visible label part
@@ -434,15 +434,15 @@ basicRow.appendChild(
 basicRow.appendChild(
   labeledInput("Level", target.level || 1, (val) => {
     target.level = Number(val);
-    updateField("level", target.level);
+    updateField("level", target.level, dex);
     updateHPBar();
   }, false, true)
 );
 basicRow.appendChild(
-  labeledInput("Exp", target.exp || 0, (val) => updateField("exp", Number(val)), false, true)
+  labeledInput("Exp", target.exp || 0, (val) => updateField("exp", Number(val), dex), false, true)
 );
 basicRow.appendChild(
-  labeledInput("Nature", target.nature || '', (val) => updateField("nature", val), false, true)
+  labeledInput("Nature", target.nature || '', (val) => updateField("nature", val, dex), false, true)
 );
 
 const basicRowSection = document.createElement('div');
@@ -458,8 +458,8 @@ abilityRow.appendChild(
     "Held Item",
     target.heldItem || '',
     target.heldItemDesc || '',
-    (val) => updateField("heldItem", val),
-    (val) => updateField("heldItemDesc", val),
+    (val) => updateField("heldItem", val, dex),
+    (val) => updateField("heldItemDesc", val, dex),
     'held' // ✨ extra class
 )
 );
@@ -469,8 +469,8 @@ abilityRow.appendChild(
     "Basic Ability",
     target.basicAbility || '',
     target.basicAbilityDesc || '',
-    (val) => updateField("basicAbility", val),
-    (val) => updateField("basicAbilityDesc", val),
+    (val) => updateField("basicAbility", val, dex),
+    (val) => updateField("basicAbilityDesc", val, dex),
     'basic' // ✨ extra class
 )
 );
@@ -480,8 +480,8 @@ abilityRow.appendChild(
     "Advanced Ability",
     target.advancedAbility || '',
     target.advancedAbilityDesc || '',
-    (val) => updateField("advancedAbility", val),
-    (val) => updateField("advancedAbilityDesc", val),
+    (val) => updateField("advancedAbility", val, dex),
+    (val) => updateField("advancedAbilityDesc", val, dex),
     'advanced' // ✨ extra class
 )
 );
@@ -491,8 +491,8 @@ abilityRow.appendChild(
     "Hyper Ability",
     target.hyperAbility || '',
     target.hyperAbilityDesc || '',
-    (val) => updateField("hyperAbility", val),
-    (val) => updateField("hyperAbilityDesc", val),
+    (val) => updateField("hyperAbility", val, dex),
+    (val) => updateField("hyperAbilityDesc", val, dex),
     'hyper' // ✨ extra class
 )
 );
@@ -811,7 +811,7 @@ function renderHPSection(target) {
 
   currentHpInput.onchange = async (e) => {
     const val = Number(e.target.value);
-    await updateField("currentHP", val);
+    await updateField("currentHP", val, dex);
     updateHPBar();
   };
 
@@ -826,20 +826,6 @@ infoBox.appendChild(hpSection);
   updateHPBar(); // Initial render
 }
 
-  async function updateField(field, value) {
-    const snap = await getDoc(userDocRef);
-    const data = snap.data();
-    const pc = data?.pcPokemon || [];
-    const index = pc.findIndex(p => p?.dex === dex);
-    if (index === -1) return;
-
-    pc[index] = {
-      ...pc[index],
-      [field]: value
-    };
-
-    await updateDoc(userDocRef, { pcPokemon: pc });
-  }
 } catch (error) {
   console.error("❌ Error populating summary:", error);
   const err = document.createElement('p');
