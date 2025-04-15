@@ -134,18 +134,35 @@ async function updateField(field, value) {
     return;
   }
 
+  const userDocRef = doc(db, "pokeIDs", currentUser.uid);
   const snap = await getDoc(userDocRef);
   const data = snap.data();
   const pc = data?.pcPokemon || [];
-  const index = pc.findIndex(p => p?.dex === dex);
-  if (index === -1) return;
+  const team = data?.teamPokemon || [];
 
-  pc[index] = {
-    ...pc[index],
+  let index = pc.findIndex(p => p?.dex === dex);
+  let targetList = "pcPokemon";
+
+  if (index === -1) {
+    index = team.findIndex(p => p?.dex === dex);
+    if (index !== -1) {
+      targetList = "teamPokemon";
+    } else {
+      console.warn(`❌ Pokémon #${dex} not found in PC or Team`);
+      return;
+    }
+  }
+
+  const updatedList = targetList === "pcPokemon" ? [...pc] : [...team];
+
+  updatedList[index] = {
+    ...updatedList[index],
     [field]: value
   };
 
-  await updateDoc(userDocRef, { pcPokemon: pc });
+  await updateDoc(userDocRef, {
+    [targetList]: updatedList
+  });
 }
 
 // 🔍 Fetch Pokémon base info (name, type, etc.) and build layout
@@ -552,19 +569,41 @@ block.className = `stat-block stat-${statKey}`;
 }
 
 async function saveStatBlock() {
+  if (!currentUser) {
+    console.error("❌ Cannot save stats — currentUser is null");
+    return;
+  }
+
+  const userDocRef = doc(db, "pokeIDs", currentUser.uid);
   const snap = await getDoc(userDocRef);
   const data = snap.data();
   const pc = data?.pcPokemon || [];
-  const index = pc.findIndex(p => p?.dex === dex);
-  if (index === -1) return;
+  const team = data?.teamPokemon || [];
 
-  pc[index] = {
-    ...pc[index],
+  let index = pc.findIndex(p => p?.dex === dex);
+  let targetList = "pcPokemon";
+
+  if (index === -1) {
+    index = team.findIndex(p => p?.dex === dex);
+    if (index !== -1) {
+      targetList = "teamPokemon";
+    } else {
+      console.warn(`❌ Pokémon #${dex} not found in PC or Team`);
+      return;
+    }
+  }
+
+  const updatedList = targetList === "pcPokemon" ? [...pc] : [...team];
+
+  updatedList[index] = {
+    ...updatedList[index],
     baseStats,
     lvStats
   };
 
-  await updateDoc(userDocRef, { pcPokemon: pc });
+  await updateDoc(userDocRef, {
+    [targetList]: updatedList
+  });
 }
 
 statLabels.forEach(stat => {
@@ -710,18 +749,40 @@ container.appendChild(infoBox);
 
 // Save moves to Firestore
 async function saveMoves() {
+  if (!currentUser) {
+    console.error("❌ Cannot save moves — currentUser is null");
+    return;
+  }
+
+  const userDocRef = doc(db, "pokeIDs", currentUser.uid);
   const snap = await getDoc(userDocRef);
   const data = snap.data();
   const pc = data?.pcPokemon || [];
-  const index = pc.findIndex(p => p?.dex === dex);
-  if (index === -1) return;
+  const team = data?.teamPokemon || [];
 
-  pc[index] = {
-    ...pc[index],
+  let index = pc.findIndex(p => p?.dex === dex);
+  let targetList = "pcPokemon";
+
+  if (index === -1) {
+    index = team.findIndex(p => p?.dex === dex);
+    if (index !== -1) {
+      targetList = "teamPokemon";
+    } else {
+      console.warn(`❌ Pokémon #${dex} not found in PC or Team`);
+      return;
+    }
+  }
+
+  const updatedList = targetList === "pcPokemon" ? [...pc] : [...team];
+
+  updatedList[index] = {
+    ...updatedList[index],
     moves
   };
 
-  await updateDoc(userDocRef, { pcPokemon: pc });
+  await updateDoc(userDocRef, {
+    [targetList]: updatedList
+  });
 }
 
 // 🧪 HP Section
