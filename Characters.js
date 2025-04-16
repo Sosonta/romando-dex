@@ -27,7 +27,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyC-Cm1l3B2PEij8qpL4e5jdXMkw8hdEo8A",
   authDomain: "romando-pokedex.firebaseapp.com",
   projectId: "romando-pokedex",
-  storageBucket: "romando-pokedex.appspot.com",
+  storageBucket: "romando-pokedex.firebasestorage.app",
   messagingSenderId: "899618896757",
   appId: "1:899618896757:web:65f6bef3bb67c87b45313c",
   measurementId: "G-2B43FHSPX9"
@@ -60,50 +60,42 @@ function createCharBlock(data, id) {
   topRow.style.marginBottom = "8px";
 
   fields.forEach(field => {
-    if (field === "Image") {
-      const imageBox = document.createElement("div");
-      imageBox.className = "image-box";
-      imageBox.style.width = "128px";
-      imageBox.style.height = "128px";
-      imageBox.style.backgroundColor = "white";
-      imageBox.style.backgroundSize = "cover";
-      imageBox.style.backgroundPosition = "center";
-      imageBox.style.border = "2px solid #444";
-      imageBox.style.borderRadius = "2px";
-      imageBox.title = "Right-click to upload";
+if (field === "Image") {
+  input.className = "image-box";
+  input.readOnly = true;
 
-      if (data.Image) {
-        imageBox.style.backgroundImage = `url(${data.Image})`;
-      }
+  input.style.backgroundImage = `url(${data.Image})`;
+  input.style.backgroundSize = "cover";
+  input.style.backgroundPosition = "center";
 
-      const fileInput = document.createElement("input");
-      fileInput.type = "file";
-      fileInput.accept = "image/*";
-      fileInput.style.display = "none";
+  // Hidden file input
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/*";
+  fileInput.style.display = "none";
 
-      fileInput.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const storagePath = `character-images/${id}.png`;
-        const imageRef = storageRef(storage, storagePath);
-        await uploadBytes(imageRef, file);
-        const url = await getDownloadURL(imageRef);
-
-        imageBox.style.backgroundImage = `url(${url})`;
-        await updateChar(id, "Image", url);
+  // On file chosen
+  fileInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+        const imageData = e.target.result;
+        input.style.backgroundImage = `url(${imageData})`;
+        await updateChar(id, "Image", imageData);
       };
-
-      imageBox.oncontextmenu = (e) => {
-        e.preventDefault();
-        fileInput.click();
-      };
-
-      const imageWrapper = document.createElement("div");
-      imageWrapper.appendChild(imageBox);
-      imageWrapper.appendChild(fileInput);
-      topRow.appendChild(imageWrapper);
+      reader.readAsDataURL(file);
     }
+  });
+
+  // Trigger upload on right click
+  input.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    fileInput.click();
+  });
+
+  block.appendChild(fileInput);
+}
 
     if (field === "Name" || field === "Location") {
       if (!inputs["textCol"]) {
