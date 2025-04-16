@@ -27,7 +27,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyC-Cm1l3B2PEij8qpL4e5jdXMkw8hdEo8A",
   authDomain: "romando-pokedex.firebaseapp.com",
   projectId: "romando-pokedex",
-  storageBucket: "romando-pokedex.firebasestorage.app",
+  storageBucket: "romando-pokedex.appspot.com",
   messagingSenderId: "899618896757",
   appId: "1:899618896757:web:65f6bef3bb67c87b45313c",
   measurementId: "G-2B43FHSPX9"
