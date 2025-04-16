@@ -95,7 +95,6 @@ if (field === "Image") {
 
   topRow.appendChild(input);
   block.appendChild(fileInput);
-  return; // Skip rest of this loop iteration
 }
 
     if (field === "Name" || field === "Location") {
