@@ -65,7 +65,6 @@ if (field === "Image") {
   imageBox.className = "image-box";
   imageBox.style.width = "128px";
   imageBox.style.height = "128px";
-  imageBox.style.border = "1px solid #ccc";
   imageBox.style.backgroundColor = "#fff";
   imageBox.style.backgroundImage = `url(${data.Image})`;
   imageBox.style.backgroundSize = "cover";
