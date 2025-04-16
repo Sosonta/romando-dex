@@ -663,7 +663,9 @@ function updateEvasionDisplay() {
 const movesBox = document.createElement('div');
 movesBox.className = 'moves-box';
 
-const moves = target.moves || Array(6).fill({ name: '', tag: '', desc: '' });
+const moves = Array.isArray(target.moves) && target.moves.length === 6
+  ? target.moves
+  : Array.from({ length: 6 }, () => ({ name: '', tag: '', desc: '', meta: '' }));
 
 moves.forEach((move, index) => {
   const moveWrapper = document.createElement('div');
