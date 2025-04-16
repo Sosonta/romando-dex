@@ -61,6 +61,7 @@ function createCharBlock(data, id) {
 
   fields.forEach(field => {
 if (field === "Image") {
+  const input = document.createElement("div");
   input.className = "image-box";
   input.readOnly = true;
 
@@ -74,7 +75,6 @@ if (field === "Image") {
   fileInput.accept = "image/*";
   fileInput.style.display = "none";
 
-  // On file chosen
   fileInput.addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -88,13 +88,14 @@ if (field === "Image") {
     }
   });
 
-  // Trigger upload on right click
   input.addEventListener("contextmenu", (e) => {
     e.preventDefault();
     fileInput.click();
   });
 
+  topRow.appendChild(input);
   block.appendChild(fileInput);
+  return; // Skip rest of this loop iteration
 }
 
     if (field === "Name" || field === "Location") {
