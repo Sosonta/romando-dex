@@ -61,15 +61,18 @@ function createCharBlock(data, id) {
 
   fields.forEach(field => {
 if (field === "Image") {
-  const input = document.createElement("div");
-  input.className = "image-box";
-  input.readOnly = true;
+  const imageBox = document.createElement("div");
+  imageBox.className = "image-box";
+  imageBox.style.width = "128px";
+  imageBox.style.height = "128px";
+  imageBox.style.border = "1px solid #ccc";
+  imageBox.style.backgroundColor = "#fff";
+  imageBox.style.backgroundImage = `url(${data.Image})`;
+  imageBox.style.backgroundSize = "cover";
+  imageBox.style.backgroundPosition = "center";
+  imageBox.style.cursor = "pointer";
+  imageBox.style.borderRadius = "4px";
 
-  input.style.backgroundImage = `url(${data.Image})`;
-  input.style.backgroundSize = "cover";
-  input.style.backgroundPosition = "center";
-
-  // Hidden file input
   const fileInput = document.createElement("input");
   fileInput.type = "file";
   fileInput.accept = "image/*";
@@ -81,19 +84,19 @@ if (field === "Image") {
       const reader = new FileReader();
       reader.onload = async function (e) {
         const imageData = e.target.result;
-        input.style.backgroundImage = `url(${imageData})`;
+        imageBox.style.backgroundImage = `url(${imageData})`;
         await updateChar(id, "Image", imageData);
       };
       reader.readAsDataURL(file);
     }
   });
 
-  input.addEventListener("contextmenu", (e) => {
+  imageBox.addEventListener("contextmenu", (e) => {
     e.preventDefault();
     fileInput.click();
   });
 
-  topRow.appendChild(input);
+  topRow.appendChild(imageBox);
   block.appendChild(fileInput);
 }
 
